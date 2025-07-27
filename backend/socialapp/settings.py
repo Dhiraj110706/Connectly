@@ -83,8 +83,8 @@ TEMPLATES = [
 ]
 
 # WSGI_APPLICATION = 'socialapp.wsgi.application'
+# ASGI_APPLICATION = 'socialapp.asgi.application'
 ASGI_APPLICATION = 'socialapp.asgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
