@@ -150,19 +150,7 @@ from asgiref.sync import async_to_sync
 from .models import Post, Comment
 from .serializers import PostSerializer, PostCreateSerializer, CommentCreateSerializer, CommentSerializer
 
-# Get channel layer for WebSocket broadcasting
-channel_layer = get_channel_layer()
 
-def broadcast_to_feed(event_type, data):
-    """Broadcast updates to all connected feed clients"""
-    if channel_layer:
-        async_to_sync(channel_layer.group_send)(
-            'feed_updates',
-            {
-                'type': event_type,
-                **data
-            }
-        )
 
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
