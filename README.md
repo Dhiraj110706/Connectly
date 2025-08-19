@@ -88,7 +88,6 @@ GET /api/posts/user/{user_id}/ - Get user's posts
 Chat
 
 GET /api/chat/messages/ - Get chat messages
-WS /ws/chat/{room_name}/ - WebSocket for real-time chat
 
 🎨 UI Features
 
@@ -150,7 +149,7 @@ Vite
 Tailwind CSS
 Axios
 React Router
-WebSocket Client
+
 
 📞 Support
 For issues and questions:

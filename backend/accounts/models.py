@@ -20,3 +20,6 @@ class User(AbstractUser):
 
     def following_count(self):
         return self.following.count()
+
+    def __str__(self):
+        return self.username

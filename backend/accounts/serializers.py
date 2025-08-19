@@ -77,6 +77,13 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'avatar', 'bio', 'followers_count', 'following_count', 'created_at')
 
+        def get_is_following(self, obj):
+            """Check if current user is following this user"""
+            request = self.context.get('request')
+            if request and hasattr(request, 'user') and request.user.is_authenticated:
+                return request.user.following.filter(id=obj.id).exists()
+            return False
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
