@@ -17,14 +17,26 @@ class ChatMessageListView(generics.ListAPIView):
         user = self.request.user
         other_user_id = self.request.query_params.get('user_id')
         
+        # Get users who are followers or following the current user
+        followers = user.followers.all()
+        following = user.following.all()
+        allowed_users = followers.union(following)
+        allowed_user_ids = allowed_users.values_list('id', flat=True)
+        
         if other_user_id:
+            # Check if the other_user is in the allowed list
+            if int(other_user_id) not in allowed_user_ids:
+                return ChatMessage.objects.none()  # Return empty queryset
+            
             return ChatMessage.objects.filter(
                 Q(sender=user, receiver_id=other_user_id) |
                 Q(sender_id=other_user_id, receiver=user)
             ).order_by('timestamp')
         
+        # Return messages only with followers/following users
         return ChatMessage.objects.filter(
-            Q(sender=user) | Q(receiver=user)
+            (Q(sender=user) | Q(receiver=user)) &
+            (Q(sender_id__in=allowed_user_ids) | Q(receiver_id__in=allowed_user_ids))
         ).order_by('timestamp')
 
 @api_view(['POST'])
@@ -39,6 +51,17 @@ def send_message(request):
     
     try:
         receiver = User.objects.get(id=receiver_id)
+        
+        # Check if receiver is a follower or following
+        user = request.user
+        followers = user.followers.all()
+        following = user.following.all()
+        allowed_users = followers.union(following)
+        
+        if receiver not in allowed_users:
+            return Response({'error': 'You can only send messages to followers or users you follow'}, 
+                           status=status.HTTP_403_FORBIDDEN)
+        
         chat_message = ChatMessage.objects.create(
             sender=request.user,
             receiver=receiver,
